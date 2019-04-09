@@ -2,5 +2,8 @@
     <string name="app_name">Treasure Hunter</string>
     <string name="start">Start</string>
     <string name="start_title">Let the hunt begin!</string>
+    <string name="NOGPS">No GPS signal, please turn on!</string>
+    <string name="EXTRA_REPLY">RESULT</string>
+    <string name="NO_PERMISSION">Please enable permission in settings!</string>
 
 </resources>
