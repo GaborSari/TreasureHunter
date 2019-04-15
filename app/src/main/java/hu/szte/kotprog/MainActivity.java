@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, data.getStringExtra(String.valueOf(R.string.EXTRA_REPLY)), Toast.LENGTH_LONG).show();
                 }
                 break;
-            case (PERMISSION): {
-                Toast.makeText(MainActivity.this, String.valueOf(resultCode), Toast.LENGTH_LONG).show();
-            }
         }
 
     }
