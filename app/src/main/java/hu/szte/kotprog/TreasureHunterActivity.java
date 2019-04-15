@@ -28,8 +28,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
     private LocationManager locationManager;
-    private MPoint treasure = new MPoint();
-    private MPoint currentLocation = new MPoint();
+    private Location treasure = new Location("treasure");
+    private Location currentLocation = new Location("currentLocation");
     private double startDistance;
 
     private TextView distanceTextView;
@@ -89,14 +89,13 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
            this.currentLocation.setLongitude(location.getLongitude());
            this.currentLocation.setLatitude(location.getLatitude());
 
-        Log.i("treasure unset",this.treasure.unset()? "true" : "false");
-           if(!this.treasure.unset()){
+           if(this.treasure.getLongitude() != 0){
 
 
 
-               double distance = this.calculateDistanceBetweenPoints(this.currentLocation.getLatitude(),this.currentLocation.getLongitude(),this.treasure.getLatitude(),this.treasure.getLongitude());
+               double distance = this.currentLocation.distanceTo(this.treasure);
 
-               Log.i("distance",String.valueOf(distance*1000));
+               Log.i("distance",String.valueOf(distance));
 
                int bottom = 0;
                int top = 0;
@@ -170,8 +169,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
     public void rndTreasure_Click(View view){
-        Log.i("currentLocation.unset",this.currentLocation.unset()? " true":"false");
-        if(this.currentLocation.unset())  {
+        Log.i("currentLocation.unset",this.currentLocation.getLongitude() == 0 ? " true":"false");
+        if(this.currentLocation.getLatitude() == 0)  {
             Toast.makeText(this, "No GPS information yet!", Toast.LENGTH_SHORT).show(); return;
         }
 
@@ -187,18 +186,9 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
         this.treasure.setLongitude(this.currentLocation.getLongitude()  + Math.sin(angle)*radiusInPoint);
 
 
-        this.startDistance = this.calculateDistanceBetweenPoints(this.currentLocation.getLatitude(),this.currentLocation.getLongitude(),this.treasure.getLatitude(),this.treasure.getLongitude());
+        this.startDistance = this.currentLocation.distanceTo(this.treasure);
 
 
-    }
-
-
-    public double calculateDistanceBetweenPoints(
-            double x1,
-            double y1,
-            double x2,
-            double y2) {
-        return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
     }
 
 }
