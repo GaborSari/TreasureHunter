@@ -41,8 +41,9 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
         this.locationManager =  (LocationManager) getSystemService(LOCATION_SERVICE);
         this.locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER,
-                1000,
-                1, this);
+                5000,
+                3, this);
+        this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 3, this);
 
         setContentView(R.layout.activity_treasure_hunter);
         boolean enabled = this.locationManager
@@ -84,11 +85,15 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
         @Override
         public void onLocationChanged(final Location location) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            String Text = latitude + " " + longitude;
+            Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
 
            this.currentLocation.setLongitude(location.getLongitude());
            this.currentLocation.setLatitude(location.getLatitude());
 
-           if(this.treasure.getLongitude() != 0){
+           if(this.treasure.getLongitude() != 0 && this.treasure.getLatitude() != 0){
 
                double distance = this.currentLocation.distanceTo(this.treasure);
 
@@ -104,7 +109,10 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
                }
                else {
                     top = (int)((distance/startDistance)*255);
-                    top = 255 - top;
+                    Log.i("test",String.valueOf((distance/startDistance)));
+                    Log.i("top",String.valueOf(top));
+                    if(top>255)
+                        top=255;
                     top = android.graphics.Color.argb(255,255, top, top);
                }
 
@@ -115,8 +123,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
                });
                indicator.setBackground(drawable);
 
-                int d = (int)(this.startDistance*100000000);
-                int c = (int) (distance * 100000000);
+                int d = (int)(this.startDistance);
+                int c = (int) (distance );
                this.distanceTextView.setText(String.valueOf(c) + " / " +String.valueOf(d));
 
 
@@ -165,6 +173,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
         this.startDistance = this.currentLocation.distanceTo(this.treasure);
+        Log.i("startdistance",String.valueOf(startDistance));
         Button btn = (Button) findViewById(R.id.rndTreasure);
         btn.setEnabled(false);
         this.onLocationChanged(this.currentLocation);
