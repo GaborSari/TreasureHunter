@@ -90,43 +90,22 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
            if(this.treasure.getLongitude() != 0){
 
-
-
                double distance = this.currentLocation.distanceTo(this.treasure);
 
                Log.i("distance",String.valueOf(distance));
 
-               int bottom = 0;
-               int top = 0;
-               if(distance < (5) ){
-                   bottom = android.graphics.Color.argb(255,255, 30, 0);
-                   top = android.graphics.Color.argb(255,150, 0, 0);
+
+               int bottom = android.graphics.Color.argb(255,0, 0, 0);
+               int top;
+               if(distance < 5) {
+                   bottom = android.graphics.Color.argb(255,255, 0, 0);
+                   top = android.graphics.Color.argb(255,255, 0, 0);
                    Toast.makeText(this, "You find the treasure!", Toast.LENGTH_LONG).show();
                }
-
-               if(distance < (25) ){
-                   bottom = android.graphics.Color.argb(255,227, 83, 48);
-                   top = android.graphics.Color.argb(255,192, 56, 49);
-               }
-
-               if(distance < (50)){
-                   bottom = android.graphics.Color.argb(255,227, 109, 81);
-                   top = android.graphics.Color.argb(255,227, 124, 94);
-               }
-
-               if(distance < (100) )
-               {
-
-                   bottom = android.graphics.Color.argb(255,227, 158, 138);
-                   top = android.graphics.Color.argb(255,227, 146, 126);
-               }
-
-
-
-               if(distance >= (100) )
-               {
-                   bottom = android.graphics.Color.argb(255,156, 196, 182);
-                   top = android.graphics.Color.argb(255,198, 196, 182);
+               else {
+                    top = (int)((distance/startDistance)*255);
+                    top = 255 - top;
+                    top = android.graphics.Color.argb(255,255, top, top);
                }
 
 
@@ -135,9 +114,10 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
                        GradientDrawable.Orientation.BOTTOM_TOP, new int[] { bottom, top
                });
                indicator.setBackground(drawable);
-                int d = (int)(this.startDistance);
-                int c = (int) (distance);
-               this.distanceTextView.setText(String.valueOf(d) + " / " +String.valueOf(c));
+
+                int d = (int)(this.startDistance*100000000);
+                int c = (int) (distance * 100000000);
+               this.distanceTextView.setText(String.valueOf(c) + " / " +String.valueOf(d));
 
 
 
