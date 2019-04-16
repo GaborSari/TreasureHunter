@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -84,8 +85,6 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
         @Override
         public void onLocationChanged(final Location location) {
 
-            Log.i("onLocationChanged","onLocationChanged");
-
            this.currentLocation.setLongitude(location.getLongitude());
            this.currentLocation.setLatitude(location.getLatitude());
 
@@ -99,23 +98,23 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
                int bottom = 0;
                int top = 0;
-               if(distance < (0.00001 * 5) ){
+               if(distance < (5) ){
                    bottom = android.graphics.Color.argb(255,255, 30, 0);
                    top = android.graphics.Color.argb(255,150, 0, 0);
                    Toast.makeText(this, "You find the treasure!", Toast.LENGTH_LONG).show();
                }
 
-               if(distance < (0.00001 * 25) ){
+               if(distance < (25) ){
                    bottom = android.graphics.Color.argb(255,227, 83, 48);
                    top = android.graphics.Color.argb(255,192, 56, 49);
                }
 
-               if(distance < (0.00001 * 50)){
+               if(distance < (50)){
                    bottom = android.graphics.Color.argb(255,227, 109, 81);
                    top = android.graphics.Color.argb(255,227, 124, 94);
                }
 
-               if(distance < (0.00001 * 100) )
+               if(distance < (100) )
                {
 
                    bottom = android.graphics.Color.argb(255,227, 158, 138);
@@ -124,7 +123,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
 
-               if(distance >= (0.00001 * 100) )
+               if(distance >= (100) )
                {
                    bottom = android.graphics.Color.argb(255,156, 196, 182);
                    top = android.graphics.Color.argb(255,198, 196, 182);
@@ -136,8 +135,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
                        GradientDrawable.Orientation.BOTTOM_TOP, new int[] { bottom, top
                });
                indicator.setBackground(drawable);
-                int d = (int)(this.startDistance*100000000);
-                int c = (int) (distance * 100000000);
+                int d = (int)(this.startDistance);
+                int c = (int) (distance);
                this.distanceTextView.setText(String.valueOf(d) + " / " +String.valueOf(c));
 
 
@@ -169,7 +168,6 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
     public void rndTreasure_Click(View view){
-        Log.i("currentLocation.unset",this.currentLocation.getLongitude() == 0 ? " true":"false");
         if(this.currentLocation.getLatitude() == 0)  {
             Toast.makeText(this, "No GPS information yet!", Toast.LENGTH_SHORT).show(); return;
         }
@@ -187,7 +185,9 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
         this.startDistance = this.currentLocation.distanceTo(this.treasure);
-
+        Button btn = (Button) findViewById(R.id.rndTreasure);
+        btn.setEnabled(false);
+        this.onLocationChanged(this.currentLocation);
 
     }
 
