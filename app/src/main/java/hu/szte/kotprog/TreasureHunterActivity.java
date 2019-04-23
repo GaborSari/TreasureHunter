@@ -32,6 +32,10 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
     private Location treasure = new Location("treasure");
     private Location currentLocation = new Location("currentLocation");
     private double startDistance;
+    private boolean loaded = false;
+
+    private Button rndTreasure;
+    private Button specTreasure;
 
     private TextView distanceTextView;
 
@@ -39,8 +43,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.locationManager =  (LocationManager) getSystemService(LOCATION_SERVICE);
-        this.locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER,
+        this.locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 5000,
                 3, this);
         this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 3, this);
@@ -67,11 +71,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-        {
-
-        }
-        else{
+        if (!this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             String EXTRA_REPLY = String.valueOf(R.string.EXTRA_REPLY);
 
             Intent replyIntent = new Intent();
@@ -83,101 +83,123 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
     }
 
 
-        @Override
-        public void onLocationChanged(final Location location) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            String Text = latitude + " " + longitude;
-            Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
+    @Override
+    public void onLocationChanged(final Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        String Text = latitude + " " + longitude;
+        Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
 
-           this.currentLocation.setLongitude(location.getLongitude());
-           this.currentLocation.setLatitude(location.getLatitude());
-
-           if(this.treasure.getLongitude() != 0 && this.treasure.getLatitude() != 0){
-
-               double distance = this.currentLocation.distanceTo(this.treasure);
-
-               Log.i("distance",String.valueOf(distance));
+        this.currentLocation.setLongitude(location.getLongitude());
+        this.currentLocation.setLatitude(location.getLatitude());
 
 
-               int bottom = android.graphics.Color.argb(255,0, 0, 0);
-               int top;
-               if(distance < 5) {
-                   bottom = android.graphics.Color.argb(255,255, 0, 0);
-                   top = android.graphics.Color.argb(255,255, 0, 0);
-                   Toast.makeText(this, "You find the treasure!", Toast.LENGTH_LONG).show();
-               }
-               else {
-                    top = (int)((distance/startDistance)*255);
-                    Log.i("test",String.valueOf((distance/startDistance)));
-                    Log.i("top",String.valueOf(top));
-                    if(top>255)
-                        top=255;
-                    top = android.graphics.Color.argb(255,255, top, top);
-               }
+        if (!this.loaded) {
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            this.loaded = true;
+        }
+
+        if (this.treasure.getLongitude() != 0 && this.treasure.getLatitude() != 0) {
+
+            double distance = this.currentLocation.distanceTo(this.treasure);
+
+            Log.i("distance", String.valueOf(distance));
 
 
-               View indicator = (View) findViewById(R.id.indicator);
-               GradientDrawable drawable = new GradientDrawable(
-                       GradientDrawable.Orientation.BOTTOM_TOP, new int[] { bottom, top
-               });
-               indicator.setBackground(drawable);
+            int bottom = android.graphics.Color.argb(255, 0, 0, 0);
+            int top;
+            if (distance < 5) {
+                bottom = android.graphics.Color.argb(255, 255, 0, 0);
+                top = android.graphics.Color.argb(255, 255, 0, 0);
+                Toast.makeText(this, "You find the treasure!", Toast.LENGTH_LONG).show();
+                this.rndTreasure.setEnabled(true);
+            } else {
+                top = (int) ((distance / startDistance) * 255);
+                Log.i("test", String.valueOf((distance / startDistance)));
+                Log.i("top", String.valueOf(top));
+                if (top > 255)
+                    top = 255;
+                top = android.graphics.Color.argb(255, 255, top, top);
+            }
 
-                int d = (int)(this.startDistance);
-                int c = (int) (distance );
-               this.distanceTextView.setText(String.valueOf(c) + " / " +String.valueOf(d));
 
+            View indicator = (View) findViewById(R.id.indicator);
+            GradientDrawable drawable = new GradientDrawable(
+                    GradientDrawable.Orientation.BOTTOM_TOP, new int[]{bottom, top
+            });
+            indicator.setBackground(drawable);
 
-
-           }
+            int sd = (int) (this.startDistance);
+            int cd = (int) (distance);
+            this.distanceTextView.setText( "Current distance:" + String.valueOf(cd) + "(" + String.valueOf(sd) + ")");
 
 
         }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        }
+    }
 
-        @Override
-        public void onProviderEnabled(String provider) {
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        }
+    }
 
-        @Override
-        public void onProviderDisabled(String provider) {
-            String EXTRA_REPLY = String.valueOf(R.string.EXTRA_REPLY);
+    @Override
+    public void onProviderEnabled(String provider) {
 
-            Intent replyIntent = new Intent();
-            replyIntent.putExtra(EXTRA_REPLY, getResources().getString(R.string.NOGPS));
-            setResult(RESULT_OK, replyIntent);
-            finish();
-        }
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        String EXTRA_REPLY = String.valueOf(R.string.EXTRA_REPLY);
+
+        Intent replyIntent = new Intent();
+        replyIntent.putExtra(EXTRA_REPLY, getResources().getString(R.string.NOGPS));
+        setResult(RESULT_OK, replyIntent);
+        finish();
+    }
 
 
-    public void rndTreasure_Click(View view){
-        if(this.currentLocation.getLatitude() == 0)  {
-            Toast.makeText(this, "No GPS information yet!", Toast.LENGTH_SHORT).show(); return;
-        }
-
+    public void rndTreasure_Click(View view) {
 
         String rad = ((EditText) findViewById(R.id.radius)).getText().toString();
+
+        if(rad.isEmpty()) return;
         double rndRadius = Float.valueOf(rad);
 
 
         double radiusInPoint = 0.00001 * rndRadius;
-        double angle = Math.random()*Math.PI*2;
+        double angle = Math.random() * Math.PI * 2;
 
-        this.treasure.setLatitude(this.currentLocation.getLatitude()  + Math.cos(angle)*radiusInPoint);
-        this.treasure.setLongitude(this.currentLocation.getLongitude()  + Math.sin(angle)*radiusInPoint);
-
+        this.treasure.setLatitude(this.currentLocation.getLatitude() + Math.cos(angle) * radiusInPoint);
+        this.treasure.setLongitude(this.currentLocation.getLongitude() + Math.sin(angle) * radiusInPoint);
 
         this.startDistance = this.currentLocation.distanceTo(this.treasure);
-        Log.i("startdistance",String.valueOf(startDistance));
-        Button btn = (Button) findViewById(R.id.rndTreasure);
-        btn.setEnabled(false);
+        Log.i("startdistance", String.valueOf(startDistance));
+        this.rndTreasure = (Button) findViewById(R.id.rndTreasure);
+        this.rndTreasure.setEnabled(false);
         this.onLocationChanged(this.currentLocation);
 
     }
+
+
+    public void specTreasure_Click(View view) {
+
+        this.specTreasure = (Button) findViewById(R.id.specTreasure);
+        this.specTreasure.setEnabled(false);
+
+        double longitude = Double.valueOf(((EditText) findViewById(R.id.longitude)).getText().toString());
+        double latitude = Double.valueOf(((EditText) findViewById(R.id.latitude)).getText().toString());
+
+        this.treasure.setLatitude(latitude);
+        this.treasure.setLongitude(longitude);
+
+        this.startDistance = this.currentLocation.distanceTo(this.treasure);
+        Log.i("startdistance", String.valueOf(startDistance));
+        this.onLocationChanged(this.currentLocation);
+
+    }
+
+
 
 }
