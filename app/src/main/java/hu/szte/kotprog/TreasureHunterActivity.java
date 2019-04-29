@@ -100,7 +100,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
         if (!this.loaded) {
-            //findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
             this.loaded = true;
         }
 
