@@ -19,7 +19,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +34,11 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
     private Location treasure = new Location("treasure");
     private Location currentLocation = new Location("currentLocation");
     private double startDistance;
+
+    private RadioButton debug;
     private boolean loaded = false;
 
-    private Button rndTreasure;
-    private Button specTreasure;
+    private Spinner metricsSpinner;
 
     private TextView distanceTextView;
 
@@ -57,7 +60,8 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivityForResult(intent, 1);
         }
-
+        this.metricsSpinner =  (Spinner) findViewById(R.id.metricsSpinner);
+        this.debug =  (RadioButton) findViewById(R.id.debug);
         this.distanceTextView = (TextView) findViewById(R.id.distanceTextView);
     }
 
@@ -88,6 +92,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         String Text = latitude + " " + longitude;
+        if(this.debug.isChecked())
         Toast.makeText(this, Text, Toast.LENGTH_SHORT).show();
 
         this.currentLocation.setLongitude(location.getLongitude());
@@ -95,7 +100,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
         if (!this.loaded) {
-            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            //findViewById(R.id.loadingPanel).setVisibility(View.GONE);
             this.loaded = true;
         }
 
@@ -112,11 +117,10 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
                 bottom = android.graphics.Color.argb(255, 255, 0, 0);
                 top = android.graphics.Color.argb(255, 255, 0, 0);
                 Toast.makeText(this, "You find the treasure!", Toast.LENGTH_LONG).show();
-                this.rndTreasure.setEnabled(true);
+                //this.rndTreasure.setEnabled(true);
             } else {
                 top = (int) ((distance / startDistance) * 255);
-                Log.i("test", String.valueOf((distance / startDistance)));
-                Log.i("top", String.valueOf(top));
+
                 if (top > 255)
                     top = 255;
                 top = android.graphics.Color.argb(255, 255, top, top);
@@ -131,6 +135,7 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
             int sd = (int) (this.startDistance);
             int cd = (int) (distance);
+            if(this.debug.isChecked())
             this.distanceTextView.setText( "Current distance:" + String.valueOf(cd) + "(" + String.valueOf(sd) + ")");
 
 
@@ -161,32 +166,30 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
 
 
     public void rndTreasure_Click(View view) {
-
+        double multipler = 1;
+        String mastext = metricsSpinner.getSelectedItem().toString();
+        if(mastext.equals("km")) multipler=1000;
+        if(mastext.equals("cm")) multipler=0.01;
         String rad = ((EditText) findViewById(R.id.radius)).getText().toString();
 
         if(rad.isEmpty()) return;
         double rndRadius = Float.valueOf(rad);
-
-
-        double radiusInPoint = 0.00001 * rndRadius;
+        double radiusInPoint = (multipler*rndRadius) / 111000f;
         double angle = Math.random() * Math.PI * 2;
 
         this.treasure.setLatitude(this.currentLocation.getLatitude() + Math.cos(angle) * radiusInPoint);
         this.treasure.setLongitude(this.currentLocation.getLongitude() + Math.sin(angle) * radiusInPoint);
 
         this.startDistance = this.currentLocation.distanceTo(this.treasure);
-        Log.i("startdistance", String.valueOf(startDistance));
-        this.rndTreasure = (Button) findViewById(R.id.rndTreasure);
-        this.rndTreasure.setEnabled(false);
+
+        //this.rndTreasure = (Button) findViewById(R.id.rndTreasure);
+        //this.rndTreasure.setEnabled(false);
         this.onLocationChanged(this.currentLocation);
 
     }
 
 
     public void specTreasure_Click(View view) {
-
-        this.specTreasure = (Button) findViewById(R.id.specTreasure);
-        this.specTreasure.setEnabled(false);
 
         double longitude = Double.valueOf(((EditText) findViewById(R.id.longitude)).getText().toString());
         double latitude = Double.valueOf(((EditText) findViewById(R.id.latitude)).getText().toString());
@@ -195,7 +198,6 @@ public class TreasureHunterActivity extends AppCompatActivity implements Locatio
         this.treasure.setLongitude(longitude);
 
         this.startDistance = this.currentLocation.distanceTo(this.treasure);
-        Log.i("startdistance", String.valueOf(startDistance));
         this.onLocationChanged(this.currentLocation);
 
     }
